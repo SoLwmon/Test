@@ -15,43 +15,50 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package test;
+package view;
 
+import model.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.awt.event.WindowListener;
 
 
 public class GameFrame extends JFrame implements WindowFocusListener {
 
+    public static final String WIN_TEXT = "CONGRATULATIONS !";
+    public static final String LOOSE_TEXT = "TRY AGAIN !";
     private static final String DEF_TITLE = "Brick Destroy";
 
     private GameBoard gameBoard;
     private HomeMenu homeMenu;
-
+    private InfoBoard infoBoard;
+    private HighScoreBoard scoreBoard;
+    
     private boolean gaming;
 
+    /**
+     * Game Frame constructor
+     */
     public GameFrame(){
         super();
 
         gaming = false;
 
         this.setLayout(new BorderLayout());
-
+        this.setResizable(false);
         gameBoard = new GameBoard(this);
-
         homeMenu = new HomeMenu(this,new Dimension(450,300));
-
+        infoBoard = new InfoBoard(this,new Dimension(450,300));
+        scoreBoard = new HighScoreBoard(this, new Dimension(600,450));
+        
         this.add(homeMenu,BorderLayout.CENTER);
-
-        this.setUndecorated(true);
-
 
     }
 
+    /**
+     * initiate the game frame
+     */
     public void initialize(){
         this.setTitle(DEF_TITLE);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -60,17 +67,81 @@ public class GameFrame extends JFrame implements WindowFocusListener {
         this.setVisible(true);
     }
 
+    /**
+     * To enable game board
+     */
     public void enableGameBoard(){
         this.dispose();
         this.remove(homeMenu);
         this.add(gameBoard,BorderLayout.CENTER);
-        this.setUndecorated(false);
         initialize();
         /*to avoid problems with graphics focus controller is added here*/
         this.addWindowFocusListener(this);
-
     }
 
+    /**
+     * To enable info board
+     */
+    public void enableInfoBoard() {
+    	this.remove(homeMenu);
+        this.add(infoBoard,BorderLayout.CENTER);
+        this.pack();
+        this.repaint();
+    }
+
+    /**
+     * To enable menu board from info board
+     */
+    public void enableMenuBoardFromInfoBoard() {
+    	this.remove(infoBoard);
+        this.add(homeMenu,BorderLayout.CENTER);
+        this.pack();
+        this.repaint();
+    }
+
+    /**
+     * To enable menu board from high score board
+     */
+    public void enableMenuBoardFromHighScoreBoard() {
+    	this.remove(scoreBoard);
+        this.add(homeMenu,BorderLayout.CENTER);
+        this.pack();
+        this.repaint();
+    }
+
+    /**
+     * To enable game board from score board
+     */
+    public void enableGameBoardFromScoreBoard() {
+    	this.remove(scoreBoard);
+        this.add(gameBoard,BorderLayout.CENTER);
+        gameBoard.requestFocusInWindow();
+        gaming=true;
+        this.pack();
+        this.repaint();
+    }
+
+    /**
+     * To enable score board from game board
+     * @param cas flag to see the win or lose text
+     * @param point point gain
+     */
+    public void enableScoreBoardFromGameBoard(boolean cas, int point) {
+    	this.remove(gameBoard);
+        this.add(scoreBoard,BorderLayout.CENTER);
+        if (cas) {
+        	scoreBoard.setTitle(WIN_TEXT);
+        }
+        else {
+        	scoreBoard.setTitle(LOOSE_TEXT);
+        }
+        scoreBoard.addScore(point);
+        scoreBoard.getScores();
+        scoreBoard.requestFocusInWindow();
+        this.pack();
+        this.repaint();
+    }
+    
     private void autoLocate(){
         Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
         int x = (size.width - this.getWidth()) / 2;
@@ -98,4 +169,5 @@ public class GameFrame extends JFrame implements WindowFocusListener {
             gameBoard.onLostFocus();
 
     }
+    
 }
