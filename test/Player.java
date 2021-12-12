@@ -15,46 +15,65 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package test;
+package model;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 
 
 public class Player {
 
 
-    public static final Color BORDER_COLOR = Color.GREEN.darker().darker();
-    public static final Color INNER_COLOR = Color.GREEN;
+    public static final Color BORDER_COLOR = new Color(0xcec9ca);
+    public static final Color INNER_COLOR = new Color(0xe7e3e4);
 
     private static final int DEF_MOVE_AMOUNT = 5;
 
-    private Rectangle playerFace;
-    private Point ballPoint;
+    private final Rectangle playerFace;
+    private final Point ballPoint;
     private int moveAmount;
-    private int min;
-    private int max;
+    private final int min;
+    private final int max;
 
-
+    /**
+     * Player constructor
+     * @param ballPoint ball coordinate at the center of the paddle
+     * @param width width of the paddle
+     * @param height height of the paddle
+     * @param container the paddle
+     */
     public Player(Point ballPoint,int width,int height,Rectangle container) {
         this.ballPoint = ballPoint;
         moveAmount = 0;
         playerFace = makeRectangle(width, height);
         min = container.x + (width / 2);
-        max = min + container.width - width;
+        max = (min + container.width) - width;
 
     }
 
+    /**
+     * Make the paddel
+     * @param width width of the paddle
+     * @param height height of the paddle
+     * @return paddle size
+     */
     private Rectangle makeRectangle(int width,int height){
         Point p = new Point((int)(ballPoint.getX() - (width / 2)),(int)ballPoint.getY());
         return  new Rectangle(p,new Dimension(width,height));
     }
 
+    /**
+     * The impact between the paddle and the ball
+     * @param b ball
+     * @return the impact
+     */
     public boolean impact(Ball b){
         return playerFace.contains(b.getPosition()) && playerFace.contains(b.down) ;
     }
 
+    /**
+     * The movement of the paddle
+     */
     public void move(){
         double x = ballPoint.getX() + moveAmount;
         if(x < min || x > max)
@@ -67,7 +86,7 @@ public class Player {
         moveAmount = -DEF_MOVE_AMOUNT;
     }
 
-    public void movRight(){
+    public void moveRight(){
         moveAmount = DEF_MOVE_AMOUNT;
     }
 
@@ -76,9 +95,17 @@ public class Player {
     }
 
     public Shape getPlayerFace(){
-        return  playerFace;
+        return new RoundRectangle2D.Float(playerFace.x,playerFace.y,playerFace.width,playerFace.height,5,5);
+    }
+    
+    public Shape getPlayerFaceInner(){
+        return new RoundRectangle2D.Float(playerFace.x+3,playerFace.y+3,playerFace.width-6,playerFace.height-6,5,5);
     }
 
+    /**
+     * THe location where the paddle can move to
+     * @param p
+     */
     public void moveTo(Point p){
         ballPoint.setLocation(p);
         playerFace.setLocation(ballPoint.x - (int)playerFace.getWidth()/2,ballPoint.y);
