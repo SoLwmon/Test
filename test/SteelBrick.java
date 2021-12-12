@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package test;
+package model;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -24,32 +24,52 @@ import java.util.Random;
 
 public class SteelBrick extends Brick {
 
-    private static final String NAME = "Steel Brick";
-    private static final Color DEF_INNER = new Color(203, 203, 201);
-    private static final Color DEF_BORDER = Color.BLACK;
+    private static final Color DEF_INNER = new Color(0xc1c2d5);
+    private static final Color DEF_BORDER = new Color(0x9999a2);
     private static final int STEEL_STRENGTH = 1;
     private static final double STEEL_PROBABILITY = 0.4;
 
-    private Random rnd;
-    private Shape brickFace;
+    private final Random rnd;
+    private final Shape brickFace;
 
+    /**
+     * Steel brick constructor
+     * @param point coordinate of brick
+     * @param size size of brick
+     */
     public SteelBrick(Point point, Dimension size){
-        super(NAME,point,size,DEF_BORDER,DEF_INNER,STEEL_STRENGTH);
+        super(point,size,DEF_BORDER,DEF_INNER,STEEL_STRENGTH);
         rnd = new Random();
         brickFace = super.brickFace;
     }
 
 
+    /**
+     * Make the steel brick
+     * @param pos coordinate of brick
+     * @param size size of brick
+     * @return type of brick
+     */
     @Override
     protected Shape makeBrickFace(Point pos, Dimension size) {
         return new Rectangle(pos,size);
     }
 
+    /**
+     * get brick type
+     * @return brick type
+     */
     @Override
     public Shape getBrick() {
         return brickFace;
     }
 
+    /**
+     * To check if the brick has been impact
+     * @param point coordinate of the brick
+     * @param dir where the brick is impact
+     * @return
+     */
     public  boolean setImpact(Point2D point , int dir){
         if(super.isBroken())
             return false;
@@ -57,10 +77,17 @@ public class SteelBrick extends Brick {
         return  super.isBroken();
     }
 
+    /**
+     * set the impact probability of steel brick
+     */
     public void impact(){
-        if(rnd.nextDouble() < STEEL_PROBABILITY){
+        if(rnd.nextDouble() < getSteelProbability()){
             super.impact();
         }
+    }
+
+    public double getSteelProbability(){
+        return STEEL_PROBABILITY;
     }
 
 }
