@@ -15,13 +15,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package test;
+package view;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
-
+import model.*;
 
 
 public class DebugPanel extends JPanel {
@@ -35,19 +35,24 @@ public class DebugPanel extends JPanel {
     private JSlider ballXSpeed;
     private JSlider ballYSpeed;
 
-    private Wall wall;
+    private final Wall wall;
+    private final Level level;
 
-    public DebugPanel(Wall wall){
+    /**
+     * DebugPanel constructor
+     * @param wall wall class
+     * @param level level class
+     */
+    public DebugPanel(Wall wall,Level level){
 
         this.wall = wall;
+        this.level = level;
 
         initialize();
 
-        skipLevel = makeButton("Skip Level",e -> wall.nextLevel());
-        resetBalls = makeButton("Reset Balls",e -> wall.resetBallCount());
+        addButtons();
 
-        ballXSpeed = makeSlider(-4,4,e -> wall.setBallXSpeed(ballXSpeed.getValue()));
-        ballYSpeed = makeSlider(-4,4,e -> wall.setBallYSpeed(ballYSpeed.getValue()));
+        addSlider();
 
         this.add(skipLevel);
         this.add(resetBalls);
@@ -57,17 +62,51 @@ public class DebugPanel extends JPanel {
 
     }
 
+    /**
+     * add button to skip level and reset the ball
+     */
+    public void addButtons()
+    {
+        skipLevel = makeButton("Skip Level",e -> level.nextLevel());
+        resetBalls = makeButton("Reset Balls",e -> wall.resetBallCount());
+    }
+
+    /**
+     * add slider to change the speed of the ball
+     */
+    public void addSlider()
+    {
+        ballXSpeed = makeSlider(-4,4,e -> wall.setBallXSpeed(ballXSpeed.getValue()));
+        ballYSpeed = makeSlider(-4,4,e -> wall.setBallYSpeed(ballYSpeed.getValue()));
+    }
+
+    /**
+     * initiate the Debug panel
+     */
     private void initialize(){
         this.setBackground(DEF_BKG);
         this.setLayout(new GridLayout(2,2));
     }
 
+    /**
+     * Make the button to reset ball and skip level
+     * @param title name of the button
+     * @param e mouse click
+     * @return the button
+     */
     private JButton makeButton(String title, ActionListener e){
         JButton out = new JButton(title);
         out.addActionListener(e);
         return  out;
     }
 
+    /**
+     * Make the slider to change the speed of the ball
+     * @param min minimum speed of the ball
+     * @param max maximum speed of the ball
+     * @param e mouse click
+     * @return the slider
+     */
     private JSlider makeSlider(int min, int max, ChangeListener e){
         JSlider out = new JSlider(min,max);
         out.setMajorTickSpacing(1);
@@ -77,6 +116,11 @@ public class DebugPanel extends JPanel {
         return out;
     }
 
+    /**
+     * set the speed of the ball
+     * @param x speed on x axis
+     * @param y speed on y axis
+     */
     public void setValues(int x,int y){
         ballXSpeed.setValue(x);
         ballYSpeed.setValue(y);
